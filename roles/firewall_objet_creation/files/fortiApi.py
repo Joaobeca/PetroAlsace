@@ -1,0 +1,62 @@
+import pyfortiapi
+
+tp = "199.205.33.0/27"
+uucp = "205.33.191.0/27"
+magasin = "Petrobrevi"
+
+#Create firewall object sur FW-ASTI
+
+device = pyfortiapi.FortiGate(ipaddr="192.168.230.251",
+                              username="admin-sh",
+                              password="Jun!Peur2ri1")
+
+print("Connection Established sur Firewal ASTI")
+
+#Creation de l'objet tp
+
+obj_name = 'Lan.nonat.tp.petro-ouest-'+magasin
+
+payload = "{'name': '%s', 'type': 'subnet', 'subnet': '%s', 'associated-interface': 'ASTIM-46'}" % (obj_name, tp)
+device.create_firewall_address("%s" % obj_name, payload)
+print("Objet", payload.split(), "créé sur le Firewall.")
+
+#Creation de l'objet uucp
+
+obj_name = 'Lan.nonat.uucp.petro-ouest-'+magasin
+
+payload = "{'name': '%s', 'type': 'subnet', 'subnet': '%s', 'associated-interface': 'ASTIM-46'}" % (obj_name, uucp)
+device.create_firewall_address("%s" % obj_name, payload)
+print("Objet", payload.split(), "créé sur le Firewall.")
+
+#Create firewall object sur FW-SH
+
+device = pyfortiapi.FortiGate(ipaddr="192.168.224.1",
+                              username="admin-sh",
+                              password="Jun!Peur2ri1")
+
+print("Connection Established sur Firewall SH")
+
+#Creation de l'objet tp
+
+obj_name = 'Lan.nonat.tp.petro-ouest-'+magasin
+
+payload = "{'name': '%s', 'type': 'subnet', 'subnet': '%s', 'associated-interface': 'VLAN13-ASTI'}" % (obj_name, tp)
+device.create_firewall_address("%s" % obj_name, payload)
+print("Objet", payload.split(), "créé sur le Firewall.")
+
+#Creation de l'objet uucp
+
+obj_name = 'Lan.nonat.uucp.petro-ouest-'+magasin
+
+payload = "{'name': '%s', 'type': 'subnet', 'subnet': '%s', 'associated-interface': 'VLAN13-ASTI'}" % (obj_name, uucp)
+device.create_firewall_address("%s" % obj_name, payload)
+print("Objet", payload.split(), "créé sur le Firewall.")
+
+#Ajouter l'objet dans l'Address Group
+
+#groups = device.get_address_group()
+#my_group = device.get_address_group('grp.SW-EXTERNE')
+
+#payload_1 = "{'member': [{'name': 'Teste_Python'}]}"
+#device.update_address_group('grp.SW-EXTERNE', payload_1)
+#print(my_group)

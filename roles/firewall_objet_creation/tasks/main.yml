@@ -1,0 +1,7 @@
+---
+# tasks file for firewall_objet_creation
+- name: run Python Script
+  script: fortiApi.py
+  args:
+    executable: python3
+

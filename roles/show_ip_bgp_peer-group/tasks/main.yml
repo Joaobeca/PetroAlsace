@@ -1,0 +1,64 @@
+---
+# tasks file for show_ip_bgp_peer-group
+- name: Création des variables peer-groupe1
+  set_fact:
+    ip_peer_bgp1: 100.122.{{ uucp }}.{% if peer_name1 is defined %}1
+                                                                   {% endif %}
+
+- name: Création des variables peer-groupe2
+  set_fact:
+    ip_peer_bgp2: 100.122.{{ uucp }}.{% if peer_name2 is defined %}2
+                                                                   {% endif %}
+  when:  peer_name2 is defined
+
+- name: Vérifier si le peer groupe1 existe dans le router
+  ios_command:
+    commands: sh ip bgp peer-group "{{ peer_name1 }}"
+  register: output1
+
+- name: Vérifier si le peer groupe2 existe dans le router
+  ios_command:
+    commands: sh ip bgp peer-group "{{ peer_name2 }}"
+  register: output2
+  when:  peer_name2 is defined
+
+- assert:
+    that:
+      - output1.stdout[0] != "% No such peer-group"
+    fail_msg: "Le peer-group n'existe pas"
+    success_msg: "Le peer-group existe. On continue..."
+
+- assert:
+    that:
+      - output2.stdout[0] != "% No such peer-group"
+    fail_msg: "Le peer-group n'existe pas"
+    success_msg: "Le peer-group existe. On continue..."
+  when:  peer_name2 is defined
+
+- name: "Parse le peer-group collecte avec TextFSM pour le peer-groupe1"
+  set_fact:
+    output_parsed1: "{{ output1.stdout[0] | parse_cli_textfsm('./roles/show_ip_bgp_peer-group/templates/peer_neighbor.textfsm') }}"
+
+- name: "Parse le peer-group collecte avec TextFSM pour le peer-groupe2"
+  set_fact:
+    output_parsed2: "{{ output2.stdout[0] | parse_cli_textfsm('./roles/show_ip_bgp_peer-group/templates/peer_neighbor.textfsm') }}"
+  when:  peer_name2 is defined
+
+- name: "Vérifier si l'IP est déjà renseigné sur rri1-4G"
+  assert:
+    that:
+      - ip_peer_bgp1 not in item.IP_ADDRESS 
+    fail_msg: "L'IP est déjà present dans la table BGP"
+  with_items:
+    - "{{ output_parsed1 }}"
+  ignore_errors: True
+
+- name: "Vérifier si l'IP est déjà renseigné sur rri2"
+  ignore_errors: True
+  assert:
+    that:
+      - ip_peer_bgp2 not in item.IP_ADDRESS
+    fail_msg: "L'IP est déjà present dans la table BGP"
+  with_items:
+    - "{{ output_parsed2 }}"
+  when:  peer_name2 is defined

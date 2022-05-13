@@ -1,0 +1,101 @@
+---
+# tasks file for deploiement_configuration
+
+- name: "Configuration de la Crypto key de l'IP Wan 1"
+  ios_config:
+    lines:
+      - crypto isakmp key inifposmeicl address {{ ip_wan1 }}
+
+- name: "Configuration de la Crypto key de l'IP Wan 2"
+  ios_config:
+    lines:
+      - crypto isakmp key inifposmeicl address {{ ip_wan1 }}
+  when: ip_wan2 is defined 
+
+- name: "Configuration de la route pour ASTIMLYRA-BBH1 de la WAN 1"
+  ios_config:
+    lines:
+      - ip route {{ ip_wan1 }} 255.255.255.255 212.99.108.65
+      - ip route {{ ip_peer_bgp1 }} 255.255.255.255 98.124.{{ uucp }}.75
+  when: "'ASTIM-LYRA-BBH1' in inventory_hostname"
+
+- name: "Configuration de la route pour ASTIMLYRA-BBH1 de la WAN 2"
+  ios_config:
+    lines:
+      - ip route {{ ip_wan2 }} 255.255.255.255 212.99.108.65
+      - ip route {{ ip_peer_bgp2 }} 255.255.255.255 98.124.{{ uucp }}.203
+  when: 
+    - ip_wan2 is defined 
+    - "'ASTIM-LYRA-BBH1' in inventory_hostname"
+
+- name: "Configuration de la route pour ASTIMLYRA-BBH2 de la WAN 1"
+  ios_config:
+    lines:
+      - ip route {{ ip_wan1 }} 255.255.255.255 212.155.215.65
+      - ip route {{ ip_peer_bgp1 }} 255.255.255.255 98.124.{{ uucp }}.77
+  when: "'ASTIM-LYRA-BBH2' in inventory_hostname"
+
+- name: "Configuration de la route pour ASTIMLYRA-BBH2 de la WAN 2"
+  ios_config:
+    lines:
+      - ip route {{ ip_wan2 }} 255.255.255.255 212.155.215.65
+      - ip route {{ ip_peer_bgp2 }} 255.255.255.255 98.124.{{ uucp }}.205
+  when:
+    - ip_wan2 is defined
+    - "'ASTIM-LYRA-BBH2' in inventory_hostname"
+
+- name: "Configuration de l'ACL securité de l'IP WAN 1"
+  ios_config:
+    lines: 
+      - permit ip host {{ ip_wan1 }} any
+    parents: ip access-list extended securite
+
+- name: "Configuration de l'ACL securité de l'IP WAN 2"
+  ios_config:
+    lines:
+      - permit ip host {{ ip_wan2 }} any
+    parents: ip access-list extended securite
+  when: ip_wan2 is defined
+
+- name: "Configuration BGP sur le router ASTIMLYRA-BBH1 si IPWAN2 est pas utilisé"
+  ios_config:
+    lines:
+      - neighbor {{ ip_peer_bgp1 }} peer-group {{ peer_name1 }}
+    parents: router bgp 64612
+  when:
+    - ip_wan2 is not defined
+    - "'ASTIM-LYRA-BBH1' in inventory_hostname"
+  notify: save
+
+- name: "Configuration BGP sur le router ASTIMLYRA-BBH2 si IPWAN2 est pas utilisé"
+  ios_config:
+    lines:
+      - neighbor {{ ip_peer_bgp1 }} peer-group {{ peer_name1 }}
+    parents: router bgp 64614
+  when:
+    - ip_wan2 is not defined
+    - "'ASTIM-LYRA-BBH2' in inventory_hostname"
+  notify: save
+
+- name: "Configuration BGP sur le router ASTIMLYRA-BBH1 si IPWAN2 est utilisé"
+  ios_config:
+    lines:
+      - neighbor {{ ip_peer_bgp1 }} peer-group {{ peer_name1 }}
+      - neighbor {{ ip_peer_bgp2 }} peer-group {{ peer_name2 }}
+    parents: router bgp 64612
+  when:
+    - ip_wan2 is defined
+    - "'ASTIM-LYRA-BBH1' in inventory_hostname"
+  notify: save
+
+- name: "Configuration BGP sur le router ASTIMLYRA-BBH2 si IPWAN2 est utilisé"
+  ios_config:
+    lines:
+      - neighbor {{ ip_peer_bgp1 }} peer-group {{ peer_name1 }}
+      - neighbor {{ ip_peer_bgp2 }} peer-group {{ peer_name2 }}
+    parents: router bgp 64614
+  when:
+    - ip_wan2 is defined
+    - "'ASTIM-LYRA-BBH2' in inventory_hostname"
+  notify: save
+

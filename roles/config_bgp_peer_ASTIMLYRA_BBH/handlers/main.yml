@@ -1,0 +1,13 @@
+---
+# handlers file for config_bgp_peer_ASPI_BBH
+
+- name: save
+  ios_command:
+    commands:
+      - "copy running-config flash:configuration \r\n"
+    timeout: 40
+
+- name: write memory
+  ios_command:
+    commands: wr mem
+    timeout: 40
