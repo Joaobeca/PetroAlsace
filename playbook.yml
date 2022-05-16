@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: petrosud
   gather_facts: false
   connection: local
   tasks: 
