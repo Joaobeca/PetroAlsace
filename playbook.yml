@@ -17,16 +17,16 @@
         name: config_bgp_peer_ASPI_BBS
       when: "'ASPI-BBS' in inventory_hostname"
 
-- hosts: localhost
-  gather_facts: false
-  connection: local
-  tasks:
-    - name: Creation du template Python Script
-      template:
-        src: ./roles/firewall_objet_creation/templates/script_python.j2
-        dest: ./roles/firewall_objet_creation/files/fortiApi.py
+#- hosts: localhost
+#  gather_facts: false
+#  connection: local
+#  tasks:
+#    - name: Creation du template Python Script
+#      template:
+#        src: ./roles/firewall_objet_creation/templates/script_python.j2
+#        dest: ./roles/firewall_objet_creation/files/fortiApi.py
 
-    - name: execute install script sur les Firewalls
-      include_role:
-        name: firewall_objet_creation      
+#    - name: execute install script sur les Firewalls
+#      include_role:
+#        name: firewall_objet_creation      
  
