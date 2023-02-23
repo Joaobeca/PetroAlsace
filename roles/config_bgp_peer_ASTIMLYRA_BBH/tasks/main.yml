@@ -15,14 +15,14 @@
 - name: "Configuration de la route pour ASTIMLYRA-BBH1 de la WAN 1"
   ios_config:
     lines:
-      - ip route {{ ip_wan1 }} 255.255.255.255 212.99.108.65
+      - ip route {{ ip_wan1 }} 255.255.255.255 213.249.114.33
       - ip route {{ ip_peer_bgp1 }} 255.255.255.255 98.124.{{ uucp }}.75
   when: "'ASTIM-LYRA-BBH1' in inventory_hostname"
 
 - name: "Configuration de la route pour ASTIMLYRA-BBH1 de la WAN 2"
   ios_config:
     lines:
-      - ip route {{ ip_wan2 }} 255.255.255.255 212.99.108.65
+      - ip route {{ ip_wan2 }} 255.255.255.255 213.249.114.33
       - ip route {{ ip_peer_bgp2 }} 255.255.255.255 98.124.{{ uucp }}.203
   when: 
     - ip_wan2 is defined 
@@ -31,14 +31,14 @@
 - name: "Configuration de la route pour ASTIMLYRA-BBH2 de la WAN 1"
   ios_config:
     lines:
-      - ip route {{ ip_wan1 }} 255.255.255.255 212.155.215.65
+      - ip route {{ ip_wan1 }} 255.255.255.255 94.198.202.225
       - ip route {{ ip_peer_bgp1 }} 255.255.255.255 98.124.{{ uucp }}.77
   when: "'ASTIM-LYRA-BBH2' in inventory_hostname"
 
 - name: "Configuration de la route pour ASTIMLYRA-BBH2 de la WAN 2"
   ios_config:
     lines:
-      - ip route {{ ip_wan2 }} 255.255.255.255 212.155.215.65
+      - ip route {{ ip_wan2 }} 255.255.255.255 94.198.202.225
       - ip route {{ ip_peer_bgp2 }} 255.255.255.255 98.124.{{ uucp }}.205
   when:
     - ip_wan2 is defined
